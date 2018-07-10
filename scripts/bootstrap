@@ -1,0 +1,12 @@
+#!/bin/bash
+rm -rf ../rancher-catalog/.git
+rm ../*/*.log
+rm -rf ../tmp/*
+cd ../vagrant_vg
+vagrant destroy -f
+cd ../node_first
+vagrant destroy -f
+cd ../node_second
+vagrant destroy -f
+cd ../node_third
+vagrant destroy -f

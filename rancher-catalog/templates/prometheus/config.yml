@@ -1,0 +1,6 @@
+name: Demo Prometheus
+description: |
+  Prometheus image to monitor hosts
+version: v1.6.11-Rancher
+category: Standalone Service
+maintainer: alejandroleon09@gmail.com

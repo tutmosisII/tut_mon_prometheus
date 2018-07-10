@@ -1,0 +1,104 @@
+version: '2'
+services:
+  #cadvisor:
+  #  labels:
+  #    io.rancher.scheduler.global: 'true'
+  #  tty: true
+  #  image: google/cadvisor:latest
+  #  stdin_open: true
+  #  volumes:
+  #    - "/:/rootfs:ro"
+  #    - "/var/run:/var/run:rw"
+  #    - "/sys:/sys:ro"
+  #    - "/var/lib/docker/:/var/lib/docker:ro"
+  #    - "/dev/disk:/dev/disk:ro"
+  #  networks:
+  #       - monitoringnet
+
+  #node-exporter:
+  #  # This exporter will inform about of cpu in each host configured in Rancher becasuse
+  #  # the scheduler global configuration
+  #  labels:
+  #    io.rancher.scheduler.global: 'true'
+  #  tty: true
+  #  image: prom/node-exporter:latest
+  #  stdin_open: true
+  #  ports:
+  #      - 9100:9100
+  #  networks:
+  #       - monitoringnet
+
+  prometheus:
+      tty: true
+      image: ${REGISTRY}tutmosisii/esprom:v2.3.1
+      command: --config.file=${PROM_CONFIG} ${PROM_ARGS}
+      ports:
+        - 9090:9090
+      volumes:
+        - prometheus-data:/prometheus
+        - prometheus-targets:/etc/prom-conf/targets
+      volume_driver: ${VOLUME_DRIVER}
+      extra_hosts:
+      - "rancher-server:${RANCHER_SERVER}"
+      networks:
+         - monitoringnet
+#      labels:
+#        io.rancher.container.pull_image: always
+
+  alertmanager:
+    tty: true
+    image: prom/alertmanager:v0.14.0
+    volumes:
+      - alertmanager-data:/alertmanager
+    volume_driver: ${VOLUME_DRIVER}
+    networks:
+         - monitoringnet
+
+  graf-db:
+      tty: true
+      image: infinityworks/graf-db:11
+      command: cat
+      volumes:
+         #- type: "volume"
+         #  source: grafana-data
+         #  target: /var/lib/grafana/
+         - grafana-data:/var/lib/grafana/
+      volume_driver: ${VOLUME_DRIVER}
+      networks:
+         - monitoringnet
+
+  grafana:
+      tty: true
+      image: grafana/grafana:5.0.0
+      ports:
+        - 3000:3000
+      labels:
+        io.rancher.sidekicks: graf-db
+      volumes_from:
+         - graf-db
+      networks:
+         - monitoringnet
+
+
+  prometheus-rancher-exporter:
+      tty: true
+      environment:
+        - CATTLE_URL=${CATTLE_URL}
+        - RANCHER_SECRET_KEY=${RANCHER_SECRET_KEY}
+        - RANCHER_ACCESS_KEY=${RANCHER_ACCESS_KEY}
+      labels:
+        io.rancher.container.create_agent: 'true'
+        io.rancher.container.agent.role: environment
+      image: infinityworks/prometheus-rancher-exporter:v0.22.94
+      networks:
+         - monitoringnet
+
+volumes:
+  grafana-data:
+  alertmanager-data:
+  prometheus-data:
+  prometheus-targets:
+
+networks:
+  monitoringnet:
+    driver: bridge

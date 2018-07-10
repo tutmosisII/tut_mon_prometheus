@@ -1,0 +1,2 @@
+[{"targets": ["10.1.15.125:9100"], "labels": {"datacenter": "aws", "machine":"ap
+ps2", "location":"USA","usage":"production"} }]

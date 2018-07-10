@@ -1,0 +1,6 @@
+name: Monitoring
+description: |
+  Monitoring Agents node_exoporter, cAdvisor
+version: v1.6.11-Rancher
+category: Standalone Service
+maintainer: alejandroleon09@gmail.com

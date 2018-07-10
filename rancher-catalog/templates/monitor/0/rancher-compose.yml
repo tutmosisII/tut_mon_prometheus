@@ -1,0 +1,45 @@
+.catalog:
+  name: "Monitoring"
+  version: "1.0.0"
+  description: "Monitoring Agents"
+  uuid: monitoringagent
+  minimum_rancher_version: v1.6.11
+  questions:
+  - variable: "CADVISOR_PORT"
+    label: "Port to expose cAdvisor"
+    description: "9102"
+    default: "9102"
+    required: true
+    type: int
+  - variable: "NODEEX_PORT"
+    label: "Port to expose node-exporter"
+    description: "9100"
+    default: "9100"
+    required: true
+    type: int
+
+cadvisor:
+  scale: 1
+  health_check:
+    port: 8080
+    interval: 5000
+    unhealthy_threshold: 3
+    request_line: ""
+    healthy_threshold: 2
+    response_timeout: 5000
+    initializing_timeout: 60000
+    strategy: recreate
+    reinitializing_timeout: 60000
+
+node-exporter:
+  scale: 1
+  health_check:
+    port: 9100
+    interval: 5000
+    unhealthy_threshold: 3
+    request_line: ""
+    healthy_threshold: 2
+    response_timeout: 5000
+    initializing_timeout: 60000
+    strategy: recreate
+    reinitializing_timeout: 60000
